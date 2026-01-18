@@ -25,7 +25,7 @@ if ($action === 'edit' && isset($_GET['id'])) {
     <h1 class="wp-heading-inline"><?php echo esc_html__('Products', 'wp-product-verification'); ?></h1>
 
     <?php if ($action !== 'edit'): ?>
-        <a href="#" class="page-title-action" onclick="document.getElementById('wpv-add-product-form').style.display='block'; return false;">
+        <a href="#" class="page-title-action wpv-add-product-btn">
             <?php echo esc_html__('Add New', 'wp-product-verification'); ?>
         </a>
     <?php endif; ?>
@@ -139,7 +139,7 @@ if ($action === 'edit' && isset($_GET['id'])) {
 
                 <p class="submit">
                     <input type="submit" name="submit" id="submit" class="button button-primary" value="<?php echo esc_attr__('Add Product', 'wp-product-verification'); ?>">
-                    <button type="button" class="button button-secondary" onclick="document.getElementById('wpv-add-product-form').style.display='none';">
+                    <button type="button" class="button button-secondary wpv-cancel-add-product">
                         <?php echo esc_html__('Cancel', 'wp-product-verification'); ?>
                     </button>
                 </p>

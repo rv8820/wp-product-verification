@@ -133,6 +133,7 @@
          */
         init() {
             this.handleAddProductToggle();
+            this.handleCancelAddProduct();
         },
 
         /**
@@ -140,11 +141,20 @@
          * @returns {void}
          */
         handleAddProductToggle() {
-            $('.page-title-action').on('click', function(e) {
-                if ($(this).attr('href') === '#') {
-                    e.preventDefault();
-                    $('#wpv-add-product-form').slideToggle();
-                }
+            $('.wpv-add-product-btn').on('click', function(e) {
+                e.preventDefault();
+                $('#wpv-add-product-form').slideToggle();
+            });
+        },
+
+        /**
+         * Handle cancel add product
+         * @returns {void}
+         */
+        handleCancelAddProduct() {
+            $('.wpv-cancel-add-product').on('click', function(e) {
+                e.preventDefault();
+                $('#wpv-add-product-form').slideUp();
             });
         }
     };
