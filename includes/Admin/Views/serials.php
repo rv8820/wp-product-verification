@@ -28,11 +28,11 @@ $total_pages = ceil($total_serials / $per_page);
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php echo esc_html__('Serial Numbers', 'wp-product-verification'); ?></h1>
 
-    <a href="#" class="page-title-action" onclick="document.getElementById('wpv-add-serial-form').style.display='block'; return false;">
+    <a href="#" class="page-title-action wpv-add-serial-btn">
         <?php echo esc_html__('Add New', 'wp-product-verification'); ?>
     </a>
 
-    <a href="#" class="page-title-action" onclick="document.getElementById('wpv-generate-serials-form').style.display='block'; return false;">
+    <a href="#" class="page-title-action wpv-generate-serials-btn">
         <?php echo esc_html__('Generate Serials', 'wp-product-verification'); ?>
     </a>
 
@@ -105,7 +105,7 @@ $total_pages = ceil($total_serials / $per_page);
 
             <p class="submit">
                 <input type="submit" name="submit" id="submit" class="button button-primary" value="<?php echo esc_attr__('Add Serial', 'wp-product-verification'); ?>">
-                <button type="button" class="button button-secondary" onclick="document.getElementById('wpv-add-serial-form').style.display='none';">
+                <button type="button" class="button button-secondary wpv-cancel-add-serial">
                     <?php echo esc_html__('Cancel', 'wp-product-verification'); ?>
                 </button>
             </p>
@@ -156,7 +156,7 @@ $total_pages = ceil($total_serials / $per_page);
 
             <p class="submit">
                 <input type="submit" name="submit" id="submit" class="button button-primary" value="<?php echo esc_attr__('Generate Serials', 'wp-product-verification'); ?>">
-                <button type="button" class="button button-secondary" onclick="document.getElementById('wpv-generate-serials-form').style.display='none';">
+                <button type="button" class="button button-secondary wpv-cancel-generate-serials">
                     <?php echo esc_html__('Cancel', 'wp-product-verification'); ?>
                 </button>
             </p>

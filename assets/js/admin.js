@@ -170,6 +170,8 @@
         init() {
             this.handleAddSerialToggle();
             this.handleGenerateToggle();
+            this.handleCancelAddSerial();
+            this.handleCancelGenerateSerials();
         },
 
         /**
@@ -177,13 +179,10 @@
          * @returns {void}
          */
         handleAddSerialToggle() {
-            $('a[href="#"]').on('click', function(e) {
-                const text = $(this).text();
-                if (text.includes('Add New')) {
-                    e.preventDefault();
-                    $('#wpv-add-serial-form').slideToggle();
-                    $('#wpv-generate-serials-form').slideUp();
-                }
+            $('.wpv-add-serial-btn').on('click', function(e) {
+                e.preventDefault();
+                $('#wpv-add-serial-form').slideToggle();
+                $('#wpv-generate-serials-form').slideUp();
             });
         },
 
@@ -192,13 +191,32 @@
          * @returns {void}
          */
         handleGenerateToggle() {
-            $('a[href="#"]').on('click', function(e) {
-                const text = $(this).text();
-                if (text.includes('Generate')) {
-                    e.preventDefault();
-                    $('#wpv-generate-serials-form').slideToggle();
-                    $('#wpv-add-serial-form').slideUp();
-                }
+            $('.wpv-generate-serials-btn').on('click', function(e) {
+                e.preventDefault();
+                $('#wpv-generate-serials-form').slideToggle();
+                $('#wpv-add-serial-form').slideUp();
+            });
+        },
+
+        /**
+         * Handle cancel add serial
+         * @returns {void}
+         */
+        handleCancelAddSerial() {
+            $('.wpv-cancel-add-serial').on('click', function(e) {
+                e.preventDefault();
+                $('#wpv-add-serial-form').slideUp();
+            });
+        },
+
+        /**
+         * Handle cancel generate serials
+         * @returns {void}
+         */
+        handleCancelGenerateSerials() {
+            $('.wpv-cancel-generate-serials').on('click', function(e) {
+                e.preventDefault();
+                $('#wpv-generate-serials-form').slideUp();
             });
         }
     };
