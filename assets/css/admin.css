@@ -336,3 +336,32 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Bulk Actions */
+.wpv-bulk-actions {
+    padding: 12px 20px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wpv-bulk-actions select {
+    min-width: 150px;
+}
+
+.wpv-bulk-actions .button {
+    margin: 0;
+}
+
+/* Checkbox Column */
+.wp-list-table .check-column {
+    width: 2.2em;
+    padding: 8px 0 0 3px;
+    vertical-align: top;
+}
+
+.wp-list-table .check-column input[type="checkbox"] {
+    margin: 0;
+}

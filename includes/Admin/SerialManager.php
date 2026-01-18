@@ -23,6 +23,7 @@ class SerialManager {
         add_action('admin_post_wpv_add_serial', [$this, 'add_serial']);
         add_action('admin_post_wpv_delete_serial', [$this, 'delete_serial']);
         add_action('admin_post_wpv_generate_serials', [$this, 'generate_serials']);
+        add_action('admin_post_wpv_bulk_delete_serials', [$this, 'bulk_delete_serials']);
     }
 
     /**
@@ -156,6 +157,52 @@ class SerialManager {
         wp_redirect(add_query_arg([
             'page' => 'wp-product-verification-serials',
             'deleted' => 'true',
+        ], admin_url('admin.php')));
+        exit;
+    }
+
+    /**
+     * Bulk delete serial numbers
+     *
+     * @return void
+     */
+    public function bulk_delete_serials(): void {
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have sufficient permissions to access this page.', 'wp-product-verification'));
+        }
+
+        check_admin_referer('wpv_bulk_serials', 'wpv_bulk_nonce');
+
+        $serial_ids = isset($_POST['serial_ids']) ? array_map('absint', (array) $_POST['serial_ids']) : [];
+
+        if (empty($serial_ids)) {
+            wp_redirect(add_query_arg([
+                'page' => 'wp-product-verification-serials',
+                'error' => 'no_selection',
+            ], admin_url('admin.php')));
+            exit;
+        }
+
+        global $wpdb;
+        $serials_table = $wpdb->prefix . 'wpv_serials';
+        $logs_table = $wpdb->prefix . 'wpv_verification_logs';
+
+        $deleted_count = 0;
+
+        foreach ($serial_ids as $id) {
+            if ($id > 0) {
+                $wpdb->delete($logs_table, ['serial_id' => $id], ['%d']);
+                $result = $wpdb->delete($serials_table, ['id' => $id], ['%d']);
+
+                if ($result !== false) {
+                    $deleted_count++;
+                }
+            }
+        }
+
+        wp_redirect(add_query_arg([
+            'page' => 'wp-product-verification-serials',
+            'bulk_deleted' => $deleted_count,
         ], admin_url('admin.php')));
         exit;
     }

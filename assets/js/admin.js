@@ -172,6 +172,7 @@
             this.handleGenerateToggle();
             this.handleCancelAddSerial();
             this.handleCancelGenerateSerials();
+            this.handleBulkActions();
         },
 
         /**
@@ -217,6 +218,54 @@
             $('.wpv-cancel-generate-serials').on('click', function(e) {
                 e.preventDefault();
                 $('#wpv-generate-serials-form').slideUp();
+            });
+        },
+
+        /**
+         * Handle bulk actions
+         * @returns {void}
+         */
+        handleBulkActions() {
+            // Select all checkboxes
+            $('#wpv-select-all').on('change', function() {
+                const isChecked = $(this).prop('checked');
+                $('.wpv-serial-checkbox').prop('checked', isChecked);
+            });
+
+            // Update select all checkbox based on individual checkboxes
+            $('.wpv-serial-checkbox').on('change', function() {
+                const totalCheckboxes = $('.wpv-serial-checkbox').length;
+                const checkedCheckboxes = $('.wpv-serial-checkbox:checked').length;
+                $('#wpv-select-all').prop('checked', totalCheckboxes === checkedCheckboxes);
+            });
+
+            // Bulk form submission
+            $('#wpv-bulk-serials-form').on('submit', function(e) {
+                const bulkAction = $('#wpv-bulk-action').val();
+                const checkedCount = $('.wpv-serial-checkbox:checked').length;
+
+                if (!bulkAction) {
+                    e.preventDefault();
+                    alert('Please select a bulk action.');
+                    return false;
+                }
+
+                if (checkedCount === 0) {
+                    e.preventDefault();
+                    alert('Please select serial numbers to delete.');
+                    return false;
+                }
+
+                if (bulkAction === 'delete') {
+                    const confirmMessage = checkedCount === 1
+                        ? 'Are you sure you want to delete 1 serial number?'
+                        : 'Are you sure you want to delete ' + checkedCount + ' serial numbers?';
+
+                    if (!confirm(confirmMessage)) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
             });
         }
     };
