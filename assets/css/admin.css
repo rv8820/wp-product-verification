@@ -365,3 +365,27 @@
 .wp-list-table .check-column input[type="checkbox"] {
     margin: 0;
 }
+
+/* Logo Upload */
+.wpv-logo-upload-container {
+    max-width: 600px;
+}
+
+.wpv-logo-preview {
+    margin-bottom: 15px;
+    min-height: 50px;
+}
+
+.wpv-logo-preview img {
+    max-width: 150px;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    background: #fff;
+}
+
+.wpv-upload-logo-btn,
+.wpv-remove-logo-btn {
+    margin-right: 10px;
+}

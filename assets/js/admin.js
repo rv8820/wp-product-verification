@@ -127,6 +127,8 @@
      * Product Management functionality
      */
     const WPVProducts = {
+        mediaUploader: null,
+
         /**
          * Initialize
          * @returns {void}
@@ -134,6 +136,7 @@
         init() {
             this.handleAddProductToggle();
             this.handleCancelAddProduct();
+            this.handleLogoUpload();
         },
 
         /**
@@ -155,6 +158,79 @@
             $('.wpv-cancel-add-product').on('click', function(e) {
                 e.preventDefault();
                 $('#wpv-add-product-form').slideUp();
+            });
+        },
+
+        /**
+         * Handle logo upload
+         * @returns {void}
+         */
+        handleLogoUpload() {
+            const self = this;
+
+            // Upload logo button
+            $(document).on('click', '.wpv-upload-logo-btn', function(e) {
+                e.preventDefault();
+
+                const $button = $(this);
+                const $container = $button.closest('.wpv-logo-upload-container');
+                const $preview = $container.find('.wpv-logo-preview');
+                const $input = $container.find('input[type="hidden"]');
+                const $removeBtn = $container.find('.wpv-remove-logo-btn');
+
+                // If the media frame already exists, reopen it
+                if (self.mediaUploader) {
+                    self.mediaUploader.open();
+                    return;
+                }
+
+                // Create the media frame
+                self.mediaUploader = wp.media({
+                    title: 'Select Product Logo',
+                    button: {
+                        text: 'Use this image'
+                    },
+                    multiple: false,
+                    library: {
+                        type: 'image'
+                    }
+                });
+
+                // When an image is selected, run a callback
+                self.mediaUploader.on('select', function() {
+                    const attachment = self.mediaUploader.state().get('selection').first().toJSON();
+
+                    // Set the hidden input value
+                    $input.val(attachment.id);
+
+                    // Display the image preview
+                    $preview.html('<img src="' + attachment.url + '" style="max-width: 150px; height: auto;">');
+
+                    // Show remove button
+                    $removeBtn.show();
+                });
+
+                // Open the uploader dialog
+                self.mediaUploader.open();
+            });
+
+            // Remove logo button
+            $(document).on('click', '.wpv-remove-logo-btn', function(e) {
+                e.preventDefault();
+
+                const $button = $(this);
+                const $container = $button.closest('.wpv-logo-upload-container');
+                const $preview = $container.find('.wpv-logo-preview');
+                const $input = $container.find('input[type="hidden"]');
+
+                // Clear the hidden input
+                $input.val('');
+
+                // Clear the preview
+                $preview.html('');
+
+                // Hide remove button
+                $button.hide();
             });
         }
     };

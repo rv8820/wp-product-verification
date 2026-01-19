@@ -53,7 +53,7 @@ class VerificationHandler {
 
         // Get serial with product info
         $serial = $wpdb->get_row($wpdb->prepare(
-            "SELECT s.*, p.name as product_name, p.prefix as product_prefix
+            "SELECT s.*, p.name as product_name, p.prefix as product_prefix, p.logo_id
             FROM {$serials_table} s
             LEFT JOIN {$products_table} p ON s.product_id = p.id
             WHERE s.serial_number = %s",
@@ -129,9 +129,16 @@ class VerificationHandler {
             );
         }
 
+        // Get logo URL if exists
+        $logo_url = '';
+        if (!empty($serial->logo_id)) {
+            $logo_url = wp_get_attachment_image_url(absint($serial->logo_id), 'medium');
+        }
+
         wp_send_json_success([
             'message' => $settings['success_message'],
             'product_name' => $serial->product_name,
+            'logo_url' => $logo_url,
             'verification_count' => $new_count,
             'max_verifications' => $serial->max_verifications,
             'remaining' => max(0, $serial->max_verifications - $new_count),

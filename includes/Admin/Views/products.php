@@ -91,6 +91,26 @@ if ($action === 'edit' && isset($_GET['id'])) {
                             <textarea name="product_description" id="product_description" class="large-text" rows="5"><?php echo esc_textarea($edit_product->description); ?></textarea>
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="product_logo"><?php echo esc_html__('Logo', 'wp-product-verification'); ?></label>
+                        </th>
+                        <td>
+                            <div class="wpv-logo-upload-container">
+                                <input type="hidden" name="product_logo_id" id="product_logo_id" value="<?php echo esc_attr($edit_product->logo_id ?? ''); ?>">
+                                <div class="wpv-logo-preview">
+                                    <?php if (!empty($edit_product->logo_id)): ?>
+                                        <?php echo wp_get_attachment_image(absint($edit_product->logo_id), 'thumbnail'); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <p>
+                                    <button type="button" class="button wpv-upload-logo-btn"><?php echo esc_html__('Upload Logo', 'wp-product-verification'); ?></button>
+                                    <button type="button" class="button wpv-remove-logo-btn" <?php echo empty($edit_product->logo_id) ? 'style="display:none;"' : ''; ?>><?php echo esc_html__('Remove Logo', 'wp-product-verification'); ?></button>
+                                </p>
+                                <p class="description"><?php echo esc_html__('Upload a logo image for this product. Recommended size: 300x300px', 'wp-product-verification'); ?></p>
+                            </div>
+                        </td>
+                    </tr>
                 </table>
 
                 <p class="submit">
@@ -135,6 +155,22 @@ if ($action === 'edit' && isset($_GET['id'])) {
                             <textarea name="product_description" id="product_description" class="large-text" rows="5"></textarea>
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="product_logo"><?php echo esc_html__('Logo', 'wp-product-verification'); ?></label>
+                        </th>
+                        <td>
+                            <div class="wpv-logo-upload-container">
+                                <input type="hidden" name="product_logo_id" id="product_logo_id_new" value="">
+                                <div class="wpv-logo-preview"></div>
+                                <p>
+                                    <button type="button" class="button wpv-upload-logo-btn"><?php echo esc_html__('Upload Logo', 'wp-product-verification'); ?></button>
+                                    <button type="button" class="button wpv-remove-logo-btn" style="display:none;"><?php echo esc_html__('Remove Logo', 'wp-product-verification'); ?></button>
+                                </p>
+                                <p class="description"><?php echo esc_html__('Upload a logo image for this product. Recommended size: 300x300px', 'wp-product-verification'); ?></p>
+                            </div>
+                        </td>
+                    </tr>
                 </table>
 
                 <p class="submit">
@@ -152,6 +188,7 @@ if ($action === 'edit' && isset($_GET['id'])) {
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
+                            <th style="width: 60px;"><?php echo esc_html__('Logo', 'wp-product-verification'); ?></th>
                             <th><?php echo esc_html__('Name', 'wp-product-verification'); ?></th>
                             <th><?php echo esc_html__('Prefix', 'wp-product-verification'); ?></th>
                             <th><?php echo esc_html__('Description', 'wp-product-verification'); ?></th>
@@ -162,6 +199,13 @@ if ($action === 'edit' && isset($_GET['id'])) {
                     <tbody>
                         <?php foreach ($products as $product): ?>
                             <tr>
+                                <td>
+                                    <?php if (!empty($product->logo_id)): ?>
+                                        <?php echo wp_get_attachment_image(absint($product->logo_id), 'thumbnail', false, ['style' => 'max-width:50px;height:auto;']); ?>
+                                    <?php else: ?>
+                                        <span class="dashicons dashicons-format-image" style="font-size: 40px; color: #ddd;"></span>
+                                    <?php endif; ?>
+                                </td>
                                 <td><strong><?php echo esc_html($product->name); ?></strong></td>
                                 <td><code><?php echo esc_html($product->prefix); ?></code></td>
                                 <td><?php echo esc_html(wp_trim_words($product->description, 10)); ?></td>

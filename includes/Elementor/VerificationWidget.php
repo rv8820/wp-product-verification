@@ -156,6 +156,133 @@ class VerificationWidget extends Widget_Base {
 
         $this->end_controls_section();
 
+        // Logo Settings Section
+        $this->start_controls_section(
+            'logo_settings_section',
+            [
+                'label' => __('Logo Settings', 'wp-product-verification'),
+                'tab' => Controls_Manager::TAB_CONTENT,
+            ]
+        );
+
+        $this->add_control(
+            'show_logo',
+            [
+                'label' => __('Show Product Logo', 'wp-product-verification'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Show', 'wp-product-verification'),
+                'label_off' => __('Hide', 'wp-product-verification'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'logo_position',
+            [
+                'label' => __('Logo Position', 'wp-product-verification'),
+                'type' => Controls_Manager::SELECT,
+                'default' => 'top',
+                'options' => [
+                    'top' => __('Top (Before Heading)', 'wp-product-verification'),
+                    'after_heading' => __('After Heading', 'wp-product-verification'),
+                    'before_description' => __('Before Description', 'wp-product-verification'),
+                    'after_description' => __('After Description', 'wp-product-verification'),
+                    'before_form' => __('Before Form', 'wp-product-verification'),
+                ],
+                'condition' => [
+                    'show_logo' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'logo_max_width',
+            [
+                'label' => __('Logo Max Width', 'wp-product-verification'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', '%'],
+                'range' => [
+                    'px' => [
+                        'min' => 50,
+                        'max' => 500,
+                        'step' => 5,
+                    ],
+                    '%' => [
+                        'min' => 10,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 200,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .wpv-product-logo img' => 'max-width: {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    'show_logo' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'logo_align',
+            [
+                'label' => __('Logo Alignment', 'wp-product-verification'),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'left' => [
+                        'title' => __('Left', 'wp-product-verification'),
+                        'icon' => 'eicon-text-align-left',
+                    ],
+                    'center' => [
+                        'title' => __('Center', 'wp-product-verification'),
+                        'icon' => 'eicon-text-align-center',
+                    ],
+                    'right' => [
+                        'title' => __('Right', 'wp-product-verification'),
+                        'icon' => 'eicon-text-align-right',
+                    ],
+                ],
+                'default' => 'center',
+                'selectors' => [
+                    '{{WRAPPER}} .wpv-product-logo' => 'text-align: {{VALUE}};',
+                ],
+                'condition' => [
+                    'show_logo' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'logo_spacing',
+            [
+                'label' => __('Logo Spacing', 'wp-product-verification'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 100,
+                        'step' => 1,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 20,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .wpv-product-logo' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    'show_logo' => 'yes',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
         // Messages Section
         $this->start_controls_section(
             'messages_section',
@@ -508,10 +635,35 @@ class VerificationWidget extends Widget_Base {
         // Get allowed products and convert to JSON for data attribute
         $allowed_products = !empty($settings['allowed_products']) ? $settings['allowed_products'] : [];
         $allowed_products_json = json_encode(array_map('intval', (array) $allowed_products));
+
+        // Get logo settings
+        $show_logo = $settings['show_logo'] === 'yes';
+        $logo_position = $settings['logo_position'] ?? 'top';
         ?>
         <div class="wpv-verification-widget">
+            <?php if ($show_logo && $logo_position === 'top'): ?>
+                <div class="wpv-product-logo" data-logo-position="top"></div>
+            <?php endif; ?>
+
             <h2 class="wpv-heading"><?php echo esc_html($settings['heading_text']); ?></h2>
+
+            <?php if ($show_logo && $logo_position === 'after_heading'): ?>
+                <div class="wpv-product-logo" data-logo-position="after_heading"></div>
+            <?php endif; ?>
+
+            <?php if ($show_logo && $logo_position === 'before_description'): ?>
+                <div class="wpv-product-logo" data-logo-position="before_description"></div>
+            <?php endif; ?>
+
             <p class="wpv-description"><?php echo esc_html($settings['description_text']); ?></p>
+
+            <?php if ($show_logo && $logo_position === 'after_description'): ?>
+                <div class="wpv-product-logo" data-logo-position="after_description"></div>
+            <?php endif; ?>
+
+            <?php if ($show_logo && $logo_position === 'before_form'): ?>
+                <div class="wpv-product-logo" data-logo-position="before_form"></div>
+            <?php endif; ?>
 
             <div class="wpv-form-container">
                 <form class="wpv-verification-form" id="wpv-verification-form"
@@ -519,7 +671,8 @@ class VerificationWidget extends Widget_Base {
                     data-error-invalid-message="<?php echo esc_attr($settings['error_invalid_message']); ?>"
                     data-error-max-reached-message="<?php echo esc_attr($settings['error_max_reached_message']); ?>"
                     data-error-inactive-message="<?php echo esc_attr($settings['error_inactive_message']); ?>"
-                    data-allowed-products="<?php echo esc_attr($allowed_products_json); ?>">
+                    data-allowed-products="<?php echo esc_attr($allowed_products_json); ?>"
+                    data-show-logo="<?php echo $show_logo ? 'yes' : 'no'; ?>">
                     <div class="wpv-form-row">
                         <input
                             type="text"

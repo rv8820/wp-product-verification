@@ -33,6 +33,7 @@ class Schema {
             name varchar(255) NOT NULL,
             prefix varchar(50) NOT NULL,
             description text,
+            logo_id bigint(20) unsigned DEFAULT NULL,
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
@@ -85,6 +86,12 @@ class Schema {
                 'separator_interval' => 4,
                 'notification_emails' => get_option('admin_email'),
             ]);
+        }
+
+        // Add logo_id column if it doesn't exist (for existing installations)
+        $column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$products_table} LIKE 'logo_id'");
+        if (empty($column_exists)) {
+            $wpdb->query("ALTER TABLE {$products_table} ADD COLUMN logo_id bigint(20) unsigned DEFAULT NULL AFTER description");
         }
     }
 

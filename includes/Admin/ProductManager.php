@@ -43,6 +43,7 @@ class ProductManager {
         $name = sanitize_text_field($_POST['product_name'] ?? '');
         $prefix = strtoupper(sanitize_text_field($_POST['product_prefix'] ?? ''));
         $description = sanitize_textarea_field($_POST['product_description'] ?? '');
+        $logo_id = absint($_POST['product_logo_id'] ?? 0);
 
         if (empty($name) || empty($prefix)) {
             wp_redirect(add_query_arg([
@@ -58,8 +59,9 @@ class ProductManager {
                 'name' => $name,
                 'prefix' => $prefix,
                 'description' => $description,
+                'logo_id' => $logo_id > 0 ? $logo_id : null,
             ],
-            ['%s', '%s', '%s']
+            ['%s', '%s', '%s', '%d']
         );
 
         if ($result === false) {
@@ -95,6 +97,7 @@ class ProductManager {
         $name = sanitize_text_field($_POST['product_name'] ?? '');
         $prefix = strtoupper(sanitize_text_field($_POST['product_prefix'] ?? ''));
         $description = sanitize_textarea_field($_POST['product_description'] ?? '');
+        $logo_id = absint($_POST['product_logo_id'] ?? 0);
 
         if ($id === 0 || empty($name) || empty($prefix)) {
             wp_redirect(add_query_arg([
@@ -110,9 +113,10 @@ class ProductManager {
                 'name' => $name,
                 'prefix' => $prefix,
                 'description' => $description,
+                'logo_id' => $logo_id > 0 ? $logo_id : null,
             ],
             ['id' => $id],
-            ['%s', '%s', '%s'],
+            ['%s', '%s', '%s', '%d'],
             ['%d']
         );
 

@@ -174,3 +174,25 @@
         transform: rotate(360deg);
     }
 }
+
+/* Product Logo */
+.wpv-product-logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.wpv-product-logo img {
+    max-width: 200px;
+    height: auto;
+    display: inline-block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
