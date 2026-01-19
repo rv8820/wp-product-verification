@@ -20,6 +20,14 @@
             this.$message = $form.find('#wpv-message');
             this.buttonOriginalText = this.$button.text();
 
+            // Get custom messages from data attributes
+            this.customMessages = {
+                success: $form.data('success-message') || '',
+                errorInvalid: $form.data('error-invalid-message') || '',
+                errorMaxReached: $form.data('error-max-reached-message') || '',
+                errorInactive: $form.data('error-inactive-message') || ''
+            };
+
             this.init();
         }
 
@@ -110,7 +118,8 @@
          * @returns {void}
          */
         handleSuccess(data) {
-            let message = data.message;
+            // Use custom message if set, otherwise use server message
+            let message = this.customMessages.success || data.message;
 
             if (data.product_name) {
                 message += `
@@ -135,7 +144,24 @@
          * @returns {void}
          */
         handleError(data) {
-            this.showMessage(data.message || 'Verification failed.', 'error');
+            // Use custom message based on error type, otherwise use server message
+            let message = data.message || 'Verification failed.';
+
+            if (data.error_type) {
+                switch (data.error_type) {
+                    case 'invalid':
+                        message = this.customMessages.errorInvalid || data.message;
+                        break;
+                    case 'inactive':
+                        message = this.customMessages.errorInactive || data.message;
+                        break;
+                    case 'max_reached':
+                        message = this.customMessages.errorMaxReached || data.message;
+                        break;
+                }
+            }
+
+            this.showMessage(message, 'error');
         }
 
         /**

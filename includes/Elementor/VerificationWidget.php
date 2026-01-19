@@ -124,6 +124,61 @@ class VerificationWidget extends Widget_Base {
 
         $this->end_controls_section();
 
+        // Messages Section
+        $this->start_controls_section(
+            'messages_section',
+            [
+                'label' => __('Messages', 'wp-product-verification'),
+                'tab' => Controls_Manager::TAB_CONTENT,
+            ]
+        );
+
+        $this->add_control(
+            'success_message',
+            [
+                'label' => __('Success Message', 'wp-product-verification'),
+                'type' => Controls_Manager::TEXT,
+                'default' => '',
+                'placeholder' => __('Leave empty to use default from settings', 'wp-product-verification'),
+                'description' => __('Message shown when verification succeeds', 'wp-product-verification'),
+            ]
+        );
+
+        $this->add_control(
+            'error_invalid_message',
+            [
+                'label' => __('Invalid Serial Message', 'wp-product-verification'),
+                'type' => Controls_Manager::TEXT,
+                'default' => '',
+                'placeholder' => __('Leave empty to use default from settings', 'wp-product-verification'),
+                'description' => __('Message shown when serial is not found', 'wp-product-verification'),
+            ]
+        );
+
+        $this->add_control(
+            'error_max_reached_message',
+            [
+                'label' => __('Max Reached Message', 'wp-product-verification'),
+                'type' => Controls_Manager::TEXT,
+                'default' => '',
+                'placeholder' => __('Leave empty to use default from settings', 'wp-product-verification'),
+                'description' => __('Message shown when verification limit reached', 'wp-product-verification'),
+            ]
+        );
+
+        $this->add_control(
+            'error_inactive_message',
+            [
+                'label' => __('Inactive Serial Message', 'wp-product-verification'),
+                'type' => Controls_Manager::TEXT,
+                'default' => '',
+                'placeholder' => __('Leave empty to use default from settings', 'wp-product-verification'),
+                'description' => __('Message shown when serial is deactivated', 'wp-product-verification'),
+            ]
+        );
+
+        $this->end_controls_section();
+
         // Style Section - Heading
         $this->start_controls_section(
             'heading_style_section',
@@ -423,7 +478,11 @@ class VerificationWidget extends Widget_Base {
             <p class="wpv-description"><?php echo esc_html($settings['description_text']); ?></p>
 
             <div class="wpv-form-container">
-                <form class="wpv-verification-form" id="wpv-verification-form">
+                <form class="wpv-verification-form" id="wpv-verification-form"
+                    data-success-message="<?php echo esc_attr($settings['success_message']); ?>"
+                    data-error-invalid-message="<?php echo esc_attr($settings['error_invalid_message']); ?>"
+                    data-error-max-reached-message="<?php echo esc_attr($settings['error_max_reached_message']); ?>"
+                    data-error-inactive-message="<?php echo esc_attr($settings['error_inactive_message']); ?>">
                     <div class="wpv-form-row">
                         <input
                             type="text"

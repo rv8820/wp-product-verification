@@ -76,6 +76,10 @@ class Settings {
             'separator' => sanitize_text_field($settings['separator'] ?? '-'),
             'separator_interval' => absint($settings['separator_interval'] ?? 4),
             'notification_emails' => sanitize_textarea_field($settings['notification_emails'] ?? get_option('admin_email')),
+            'success_message' => sanitize_text_field($settings['success_message'] ?? __('Serial number verified successfully!', 'wp-product-verification')),
+            'error_invalid_message' => sanitize_text_field($settings['error_invalid_message'] ?? __('Invalid serial number. Please check and try again.', 'wp-product-verification')),
+            'error_max_reached_message' => sanitize_text_field($settings['error_max_reached_message'] ?? __('This serial number has reached its maximum verification limit.', 'wp-product-verification')),
+            'error_inactive_message' => sanitize_text_field($settings['error_inactive_message'] ?? __('This serial number has been deactivated.', 'wp-product-verification')),
         ];
     }
 
@@ -91,6 +95,10 @@ class Settings {
             'separator' => '-',
             'separator_interval' => 4,
             'notification_emails' => get_option('admin_email'),
+            'success_message' => __('Serial number verified successfully!', 'wp-product-verification'),
+            'error_invalid_message' => __('Invalid serial number. Please check and try again.', 'wp-product-verification'),
+            'error_max_reached_message' => __('This serial number has reached its maximum verification limit.', 'wp-product-verification'),
+            'error_inactive_message' => __('This serial number has been deactivated.', 'wp-product-verification'),
         ];
 
         $settings = get_option('wpv_settings', []);

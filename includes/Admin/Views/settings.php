@@ -101,6 +101,49 @@ $settings = Settings::get_settings();
         </div>
 
         <div class="wpv-settings-section">
+            <h2><?php echo esc_html__('Verification Messages', 'wp-product-verification'); ?></h2>
+
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="success_message"><?php echo esc_html__('Success Message', 'wp-product-verification'); ?></label>
+                    </th>
+                    <td>
+                        <input type="text" name="wpv_settings[success_message]" id="success_message" class="large-text" value="<?php echo esc_attr($settings['success_message']); ?>">
+                        <p class="description"><?php echo esc_html__('Message displayed when a serial number is successfully verified.', 'wp-product-verification'); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="error_invalid_message"><?php echo esc_html__('Invalid Serial Message', 'wp-product-verification'); ?></label>
+                    </th>
+                    <td>
+                        <input type="text" name="wpv_settings[error_invalid_message]" id="error_invalid_message" class="large-text" value="<?php echo esc_attr($settings['error_invalid_message']); ?>">
+                        <p class="description"><?php echo esc_html__('Message displayed when a serial number is not found.', 'wp-product-verification'); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="error_max_reached_message"><?php echo esc_html__('Max Reached Message', 'wp-product-verification'); ?></label>
+                    </th>
+                    <td>
+                        <input type="text" name="wpv_settings[error_max_reached_message]" id="error_max_reached_message" class="large-text" value="<?php echo esc_attr($settings['error_max_reached_message']); ?>">
+                        <p class="description"><?php echo esc_html__('Message displayed when verification limit has been reached.', 'wp-product-verification'); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="error_inactive_message"><?php echo esc_html__('Inactive Serial Message', 'wp-product-verification'); ?></label>
+                    </th>
+                    <td>
+                        <input type="text" name="wpv_settings[error_inactive_message]" id="error_inactive_message" class="large-text" value="<?php echo esc_attr($settings['error_inactive_message']); ?>">
+                        <p class="description"><?php echo esc_html__('Message displayed when a serial number has been deactivated.', 'wp-product-verification'); ?></p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="wpv-settings-section">
             <h2><?php echo esc_html__('Email Notifications', 'wp-product-verification'); ?></h2>
 
             <table class="form-table">

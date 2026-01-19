@@ -37,6 +37,7 @@ class VerificationHandler {
         check_ajax_referer('wpv_verification_nonce', 'nonce');
 
         $serial_number = strtoupper(sanitize_text_field($_POST['serial_number'] ?? ''));
+        $settings = Settings::get_settings();
 
         if (empty($serial_number)) {
             wp_send_json_error([
@@ -61,7 +62,8 @@ class VerificationHandler {
 
         if (!$serial) {
             wp_send_json_error([
-                'message' => __('Invalid serial number. Please check and try again.', 'wp-product-verification'),
+                'message' => $settings['error_invalid_message'],
+                'error_type' => 'invalid',
             ]);
             return;
         }
@@ -69,7 +71,8 @@ class VerificationHandler {
         // Check if inactive
         if ($serial->status !== 'active') {
             wp_send_json_error([
-                'message' => __('This serial number has been deactivated.', 'wp-product-verification'),
+                'message' => $settings['error_inactive_message'],
+                'error_type' => 'inactive',
             ]);
             return;
         }
@@ -77,11 +80,10 @@ class VerificationHandler {
         // Check verification count
         if ($serial->verification_count >= $serial->max_verifications) {
             wp_send_json_error([
-                'message' => sprintf(
-                    __('This serial number has reached its maximum verification limit (%d/%d).', 'wp-product-verification'),
-                    $serial->verification_count,
-                    $serial->max_verifications
-                ),
+                'message' => $settings['error_max_reached_message'],
+                'error_type' => 'max_reached',
+                'verification_count' => $serial->verification_count,
+                'max_verifications' => $serial->max_verifications,
             ]);
             return;
         }
@@ -118,7 +120,7 @@ class VerificationHandler {
         }
 
         wp_send_json_success([
-            'message' => __('Serial number verified successfully!', 'wp-product-verification'),
+            'message' => $settings['success_message'],
             'product_name' => $serial->product_name,
             'verification_count' => $new_count,
             'max_verifications' => $serial->max_verifications,
