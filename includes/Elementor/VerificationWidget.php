@@ -639,30 +639,65 @@ class VerificationWidget extends Widget_Base {
         // Get logo settings
         $show_logo = $settings['show_logo'] === 'yes';
         $logo_position = $settings['logo_position'] ?? 'top';
+
+        // Get product logo URL if logo should be shown and products are selected
+        $logo_url = '';
+        $product_name = '';
+        if ($show_logo && !empty($allowed_products)) {
+            // If specific products are selected, use the first one's logo
+            $product_id = is_array($allowed_products) ? absint($allowed_products[0]) : absint($allowed_products);
+
+            if ($product_id > 0) {
+                global $wpdb;
+                $products_table = $wpdb->prefix . 'wpv_products';
+                $product = $wpdb->get_row($wpdb->prepare(
+                    "SELECT name, logo_id FROM {$products_table} WHERE id = %d",
+                    $product_id
+                ));
+
+                if ($product && !empty($product->logo_id)) {
+                    $attachment_url = wp_get_attachment_image_url(absint($product->logo_id), 'medium');
+                    if ($attachment_url !== false) {
+                        $logo_url = $attachment_url;
+                        $product_name = $product->name;
+                    }
+                }
+            }
+        }
         ?>
         <div class="wpv-verification-widget">
-            <?php if ($show_logo && $logo_position === 'top'): ?>
-                <div class="wpv-product-logo" data-logo-position="top"></div>
+            <?php if ($show_logo && $logo_position === 'top' && !empty($logo_url)): ?>
+                <div class="wpv-product-logo" data-logo-position="top">
+                    <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($product_name); ?>">
+                </div>
             <?php endif; ?>
 
             <h2 class="wpv-heading"><?php echo esc_html($settings['heading_text']); ?></h2>
 
-            <?php if ($show_logo && $logo_position === 'after_heading'): ?>
-                <div class="wpv-product-logo" data-logo-position="after_heading"></div>
+            <?php if ($show_logo && $logo_position === 'after_heading' && !empty($logo_url)): ?>
+                <div class="wpv-product-logo" data-logo-position="after_heading">
+                    <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($product_name); ?>">
+                </div>
             <?php endif; ?>
 
-            <?php if ($show_logo && $logo_position === 'before_description'): ?>
-                <div class="wpv-product-logo" data-logo-position="before_description"></div>
+            <?php if ($show_logo && $logo_position === 'before_description' && !empty($logo_url)): ?>
+                <div class="wpv-product-logo" data-logo-position="before_description">
+                    <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($product_name); ?>">
+                </div>
             <?php endif; ?>
 
             <p class="wpv-description"><?php echo esc_html($settings['description_text']); ?></p>
 
-            <?php if ($show_logo && $logo_position === 'after_description'): ?>
-                <div class="wpv-product-logo" data-logo-position="after_description"></div>
+            <?php if ($show_logo && $logo_position === 'after_description' && !empty($logo_url)): ?>
+                <div class="wpv-product-logo" data-logo-position="after_description">
+                    <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($product_name); ?>">
+                </div>
             <?php endif; ?>
 
-            <?php if ($show_logo && $logo_position === 'before_form'): ?>
-                <div class="wpv-product-logo" data-logo-position="before_form"></div>
+            <?php if ($show_logo && $logo_position === 'before_form' && !empty($logo_url)): ?>
+                <div class="wpv-product-logo" data-logo-position="before_form">
+                    <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($product_name); ?>">
+                </div>
             <?php endif; ?>
 
             <div class="wpv-form-container">
@@ -671,8 +706,7 @@ class VerificationWidget extends Widget_Base {
                     data-error-invalid-message="<?php echo esc_attr($settings['error_invalid_message']); ?>"
                     data-error-max-reached-message="<?php echo esc_attr($settings['error_max_reached_message']); ?>"
                     data-error-inactive-message="<?php echo esc_attr($settings['error_inactive_message']); ?>"
-                    data-allowed-products="<?php echo esc_attr($allowed_products_json); ?>"
-                    data-show-logo="<?php echo $show_logo ? 'yes' : 'no'; ?>">
+                    data-allowed-products="<?php echo esc_attr($allowed_products_json); ?>">
                     <div class="wpv-form-row">
                         <input
                             type="text"

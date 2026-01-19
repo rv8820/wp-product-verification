@@ -18,7 +18,6 @@
             this.$input = $form.find('#wpv-serial-input');
             this.$button = $form.find('.wpv-button');
             this.$message = $form.find('#wpv-message');
-            this.$logoContainer = $form.closest('.wpv-verification-widget').find('.wpv-product-logo');
             this.buttonOriginalText = this.$button.text();
 
             // Get custom messages from data attributes
@@ -32,9 +31,6 @@
             // Get allowed products
             const allowedProductsData = $form.data('allowed-products');
             this.allowedProducts = allowedProductsData ? (typeof allowedProductsData === 'string' ? JSON.parse(allowedProductsData) : allowedProductsData) : [];
-
-            // Get logo settings
-            this.showLogo = $form.data('show-logo') === 'yes';
 
             this.init();
         }
@@ -127,19 +123,6 @@
          * @returns {void}
          */
         handleSuccess(data) {
-            // Display logo if enabled and logo URL is provided
-            console.log('Logo Debug:', {
-                showLogo: this.showLogo,
-                logoUrl: data.logo_url,
-                containerExists: this.$logoContainer.length > 0,
-                containerCount: this.$logoContainer.length
-            });
-
-            if (this.showLogo && data.logo_url && data.logo_url !== '' && this.$logoContainer.length > 0) {
-                console.log('Displaying logo:', data.logo_url);
-                this.$logoContainer.html('<img src="' + this.escapeHtml(data.logo_url) + '" alt="' + this.escapeHtml(data.product_name) + '">');
-            }
-
             // Use custom message if set, otherwise use server message
             let message = this.customMessages.success || data.message;
 
