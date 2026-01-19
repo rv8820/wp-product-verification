@@ -124,6 +124,38 @@ class VerificationWidget extends Widget_Base {
 
         $this->end_controls_section();
 
+        // Product Filter Section
+        $this->start_controls_section(
+            'product_filter_section',
+            [
+                'label' => __('Product Filter', 'wp-product-verification'),
+                'tab' => Controls_Manager::TAB_CONTENT,
+            ]
+        );
+
+        // Get all products for the select control
+        $products = \WPProductVerification\Admin\ProductManager::get_products();
+        $product_options = [];
+
+        foreach ($products as $product) {
+            $product_options[$product->id] = $product->name . ' (' . $product->prefix . ')';
+        }
+
+        $this->add_control(
+            'allowed_products',
+            [
+                'label' => __('Allowed Products', 'wp-product-verification'),
+                'type' => Controls_Manager::SELECT2,
+                'multiple' => true,
+                'options' => $product_options,
+                'default' => [],
+                'label_block' => true,
+                'description' => __('Select which products can be verified with this form. Leave empty to allow all products.', 'wp-product-verification'),
+            ]
+        );
+
+        $this->end_controls_section();
+
         // Messages Section
         $this->start_controls_section(
             'messages_section',
@@ -472,6 +504,10 @@ class VerificationWidget extends Widget_Base {
      */
     protected function render(): void {
         $settings = $this->get_settings_for_display();
+
+        // Get allowed products and convert to JSON for data attribute
+        $allowed_products = !empty($settings['allowed_products']) ? $settings['allowed_products'] : [];
+        $allowed_products_json = json_encode(array_map('intval', (array) $allowed_products));
         ?>
         <div class="wpv-verification-widget">
             <h2 class="wpv-heading"><?php echo esc_html($settings['heading_text']); ?></h2>
@@ -482,7 +518,8 @@ class VerificationWidget extends Widget_Base {
                     data-success-message="<?php echo esc_attr($settings['success_message']); ?>"
                     data-error-invalid-message="<?php echo esc_attr($settings['error_invalid_message']); ?>"
                     data-error-max-reached-message="<?php echo esc_attr($settings['error_max_reached_message']); ?>"
-                    data-error-inactive-message="<?php echo esc_attr($settings['error_inactive_message']); ?>">
+                    data-error-inactive-message="<?php echo esc_attr($settings['error_inactive_message']); ?>"
+                    data-allowed-products="<?php echo esc_attr($allowed_products_json); ?>">
                     <div class="wpv-form-row">
                         <input
                             type="text"

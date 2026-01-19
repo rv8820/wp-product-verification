@@ -68,6 +68,16 @@ class VerificationHandler {
             return;
         }
 
+        // Check if product is allowed (if filter is set)
+        $allowed_products = isset($_POST['allowed_products']) ? array_map('absint', (array) $_POST['allowed_products']) : [];
+        if (!empty($allowed_products) && !in_array((int) $serial->product_id, $allowed_products, true)) {
+            wp_send_json_error([
+                'message' => $settings['error_invalid_message'],
+                'error_type' => 'invalid',
+            ]);
+            return;
+        }
+
         // Check if inactive
         if ($serial->status !== 'active') {
             wp_send_json_error([

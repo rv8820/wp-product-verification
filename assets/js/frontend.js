@@ -28,6 +28,10 @@
                 errorInactive: $form.data('error-inactive-message') || ''
             };
 
+            // Get allowed products
+            const allowedProductsData = $form.data('allowed-products');
+            this.allowedProducts = allowedProductsData ? (typeof allowedProductsData === 'string' ? JSON.parse(allowedProductsData) : allowedProductsData) : [];
+
             this.init();
         }
 
@@ -89,7 +93,8 @@
                 data: {
                     action: 'wpv_verify_serial',
                     nonce: wpvFrontend.nonce,
-                    serial_number: serialNumber
+                    serial_number: serialNumber,
+                    allowed_products: this.allowedProducts
                 },
                 success: (response) => {
                     if (response.success) {
