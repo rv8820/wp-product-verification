@@ -136,6 +136,11 @@ final class Plugin {
             return;
         }
 
+        // Enqueue WordPress media uploader for products page
+        if (strpos($hook, 'wp-product-verification-products') !== false) {
+            wp_enqueue_media();
+        }
+
         wp_enqueue_style(
             'wpv-admin-style',
             WPV_PLUGIN_URL . 'assets/css/admin.css',
