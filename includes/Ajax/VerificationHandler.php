@@ -132,7 +132,10 @@ class VerificationHandler {
         // Get logo URL if exists
         $logo_url = '';
         if (!empty($serial->logo_id)) {
-            $logo_url = wp_get_attachment_image_url(absint($serial->logo_id), 'medium');
+            $attachment_url = wp_get_attachment_image_url(absint($serial->logo_id), 'medium');
+            if ($attachment_url !== false) {
+                $logo_url = $attachment_url;
+            }
         }
 
         wp_send_json_success([

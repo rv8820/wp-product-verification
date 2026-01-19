@@ -128,7 +128,15 @@
          */
         handleSuccess(data) {
             // Display logo if enabled and logo URL is provided
-            if (this.showLogo && data.logo_url && this.$logoContainer.length > 0) {
+            console.log('Logo Debug:', {
+                showLogo: this.showLogo,
+                logoUrl: data.logo_url,
+                containerExists: this.$logoContainer.length > 0,
+                containerCount: this.$logoContainer.length
+            });
+
+            if (this.showLogo && data.logo_url && data.logo_url !== '' && this.$logoContainer.length > 0) {
+                console.log('Displaying logo:', data.logo_url);
                 this.$logoContainer.html('<img src="' + this.escapeHtml(data.logo_url) + '" alt="' + this.escapeHtml(data.product_name) + '">');
             }
 
