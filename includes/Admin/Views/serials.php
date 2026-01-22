@@ -16,13 +16,61 @@ use WPProductVerification\Admin\Settings;
 
 $products = ProductManager::get_products();
 $filter_product_id = isset($_GET['product_id']) ? absint($_GET['product_id']) : null;
+$search = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
+$orderby = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : 'created_at';
+$order = isset($_GET['order']) && strtoupper($_GET['order']) === 'ASC' ? 'ASC' : 'DESC';
 $page_num = isset($_GET['paged']) ? absint($_GET['paged']) : 1;
 $per_page = 50;
 $offset = ($page_num - 1) * $per_page;
 
-$serials = SerialManager::get_serials($filter_product_id, $per_page, $offset);
-$total_serials = SerialManager::get_serial_count($filter_product_id);
+$serials = SerialManager::get_serials($filter_product_id, $per_page, $offset, $search, $orderby, $order);
+$total_serials = SerialManager::get_serial_count($filter_product_id, $search);
 $total_pages = ceil($total_serials / $per_page);
+
+/**
+ * Generate sortable column header
+ *
+ * @param string $column Column name
+ * @param string $label Column label
+ * @param string $current_orderby Current orderby
+ * @param string $current_order Current order
+ * @return string Column header HTML
+ */
+function wpv_sortable_column(string $column, string $label, string $current_orderby, string $current_order): string {
+    $url_params = [
+        'page' => 'wp-product-verification-serials',
+        'orderby' => $column,
+    ];
+
+    // Add existing filters to URL
+    if (!empty($_GET['product_id'])) {
+        $url_params['product_id'] = absint($_GET['product_id']);
+    }
+    if (!empty($_GET['s'])) {
+        $url_params['s'] = sanitize_text_field($_GET['s']);
+    }
+
+    // Determine order direction
+    if ($current_orderby === $column) {
+        $url_params['order'] = $current_order === 'ASC' ? 'DESC' : 'ASC';
+        $class = 'sorted';
+        $arrow = $current_order === 'ASC' ? ' ↑' : ' ↓';
+    } else {
+        $url_params['order'] = 'ASC';
+        $class = 'sortable';
+        $arrow = '';
+    }
+
+    $url = add_query_arg($url_params, admin_url('admin.php'));
+
+    return sprintf(
+        '<th class="%s"><a href="%s">%s%s</a></th>',
+        esc_attr($class),
+        esc_url($url),
+        esc_html($label),
+        $arrow
+    );
+}
 ?>
 
 <div class="wrap">
@@ -182,18 +230,35 @@ $total_pages = ceil($total_serials / $per_page);
     <!-- Filter and List -->
     <div class="wpv-table-container">
         <div class="tablenav top">
-            <form method="get" action="">
-                <input type="hidden" name="page" value="wp-product-verification-serials">
-                <label for="filter_product_id"><?php echo esc_html__('Filter by Product:', 'wp-product-verification'); ?></label>
-                <select name="product_id" id="filter_product_id" onchange="this.form.submit();">
-                    <option value=""><?php echo esc_html__('All Products', 'wp-product-verification'); ?></option>
-                    <?php foreach ($products as $product): ?>
-                        <option value="<?php echo esc_attr($product->id); ?>" <?php selected($filter_product_id, $product->id); ?>>
-                            <?php echo esc_html($product->name); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </form>
+            <div class="alignleft actions">
+                <form method="get" action="" style="display: inline-block; margin-right: 10px;">
+                    <input type="hidden" name="page" value="wp-product-verification-serials">
+                    <?php if (!empty($search)): ?>
+                        <input type="hidden" name="s" value="<?php echo esc_attr($search); ?>">
+                    <?php endif; ?>
+                    <label for="filter_product_id"><?php echo esc_html__('Filter by Product:', 'wp-product-verification'); ?></label>
+                    <select name="product_id" id="filter_product_id" onchange="this.form.submit();">
+                        <option value=""><?php echo esc_html__('All Products', 'wp-product-verification'); ?></option>
+                        <?php foreach ($products as $product): ?>
+                            <option value="<?php echo esc_attr($product->id); ?>" <?php selected($filter_product_id, $product->id); ?>>
+                                <?php echo esc_html($product->name); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+            </div>
+
+            <div class="alignright actions">
+                <form method="get" action="" style="display: inline-block;">
+                    <input type="hidden" name="page" value="wp-product-verification-serials">
+                    <?php if ($filter_product_id): ?>
+                        <input type="hidden" name="product_id" value="<?php echo esc_attr($filter_product_id); ?>">
+                    <?php endif; ?>
+                    <label for="serial-search-input" class="screen-reader-text"><?php echo esc_html__('Search Serial Numbers:', 'wp-product-verification'); ?></label>
+                    <input type="search" id="serial-search-input" name="s" value="<?php echo esc_attr($search); ?>" placeholder="<?php echo esc_attr__('Search serial numbers...', 'wp-product-verification'); ?>">
+                    <input type="submit" id="search-submit" class="button" value="<?php echo esc_attr__('Search', 'wp-product-verification'); ?>">
+                </form>
+            </div>
         </div>
 
         <?php if (!empty($serials)): ?>
@@ -216,11 +281,11 @@ $total_pages = ceil($total_serials / $per_page);
                             <td class="manage-column column-cb check-column">
                                 <input type="checkbox" id="wpv-select-all">
                             </td>
-                            <th><?php echo esc_html__('Serial Number', 'wp-product-verification'); ?></th>
-                            <th><?php echo esc_html__('Product', 'wp-product-verification'); ?></th>
-                            <th><?php echo esc_html__('Verifications', 'wp-product-verification'); ?></th>
-                            <th><?php echo esc_html__('Status', 'wp-product-verification'); ?></th>
-                            <th><?php echo esc_html__('Created', 'wp-product-verification'); ?></th>
+                            <?php echo wpv_sortable_column('serial_number', __('Serial Number', 'wp-product-verification'), $orderby, $order); ?>
+                            <?php echo wpv_sortable_column('product_name', __('Product', 'wp-product-verification'), $orderby, $order); ?>
+                            <?php echo wpv_sortable_column('verification_count', __('Verifications', 'wp-product-verification'), $orderby, $order); ?>
+                            <?php echo wpv_sortable_column('status', __('Status', 'wp-product-verification'), $orderby, $order); ?>
+                            <?php echo wpv_sortable_column('created_at', __('Created', 'wp-product-verification'), $orderby, $order); ?>
                             <th><?php echo esc_html__('Actions', 'wp-product-verification'); ?></th>
                         </tr>
                     </thead>
@@ -261,8 +326,22 @@ $total_pages = ceil($total_serials / $per_page);
                 <div class="tablenav bottom">
                     <div class="tablenav-pages">
                         <?php
+                        $pagination_args = ['paged' => '%#%'];
+                        if ($filter_product_id) {
+                            $pagination_args['product_id'] = $filter_product_id;
+                        }
+                        if (!empty($search)) {
+                            $pagination_args['s'] = $search;
+                        }
+                        if ($orderby !== 'created_at') {
+                            $pagination_args['orderby'] = $orderby;
+                        }
+                        if ($order !== 'DESC') {
+                            $pagination_args['order'] = $order;
+                        }
+
                         echo paginate_links([
-                            'base' => add_query_arg('paged', '%#%'),
+                            'base' => add_query_arg($pagination_args),
                             'format' => '',
                             'prev_text' => __('&laquo;'),
                             'next_text' => __('&raquo;'),

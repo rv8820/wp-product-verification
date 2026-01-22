@@ -389,3 +389,45 @@
 .wpv-remove-logo-btn {
     margin-right: 10px;
 }
+
+/* Sortable Columns */
+.wp-list-table th.sortable a,
+.wp-list-table th.sorted a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.wp-list-table th.sortable a:hover,
+.wp-list-table th.sorted a:hover {
+    color: #0073aa;
+}
+
+.wp-list-table th.sorted {
+    background-color: #f0f0f1;
+}
+
+/* Search and Filter */
+.tablenav.top {
+    margin-bottom: 10px;
+    padding: 8px 0;
+}
+
+.tablenav .alignleft.actions {
+    float: left;
+}
+
+.tablenav .alignright.actions {
+    float: right;
+}
+
+.tablenav::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+#serial-search-input {
+    width: 250px;
+    padding: 4px 8px;
+    margin-right: 4px;
+}

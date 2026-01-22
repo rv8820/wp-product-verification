@@ -284,24 +284,65 @@ class SerialManager {
      * @param int|null $product_id Optional product ID filter
      * @param int $limit Number of results to return
      * @param int $offset Offset for pagination
+     * @param string $search Optional search term
+     * @param string $orderby Column to order by
+     * @param string $order Sort order (ASC or DESC)
      * @return array<int, object> Serial numbers array
      */
-    public static function get_serials(?int $product_id = null, int $limit = 50, int $offset = 0): array {
+    public static function get_serials(?int $product_id = null, int $limit = 50, int $offset = 0, string $search = '', string $orderby = 'created_at', string $order = 'DESC'): array {
         global $wpdb;
         $serials_table = $wpdb->prefix . 'wpv_serials';
         $products_table = $wpdb->prefix . 'wpv_products';
+
+        // Validate orderby column
+        $allowed_orderby = ['serial_number', 'product_name', 'verification_count', 'status', 'created_at'];
+        if (!in_array($orderby, $allowed_orderby, true)) {
+            $orderby = 'created_at';
+        }
+
+        // Validate order direction
+        $order = strtoupper($order);
+        if (!in_array($order, ['ASC', 'DESC'], true)) {
+            $order = 'DESC';
+        }
 
         $sql = "SELECT s.*, p.name as product_name, p.prefix as product_prefix
                 FROM {$serials_table} s
                 LEFT JOIN {$products_table} p ON s.product_id = p.id";
 
+        $where_clauses = [];
+        $where_values = [];
+
         if ($product_id !== null) {
-            $sql .= $wpdb->prepare(" WHERE s.product_id = %d", $product_id);
+            $where_clauses[] = 's.product_id = %d';
+            $where_values[] = $product_id;
         }
 
-        $sql .= " ORDER BY s.created_at DESC LIMIT %d OFFSET %d";
+        if (!empty($search)) {
+            $where_clauses[] = '(s.serial_number LIKE %s OR p.name LIKE %s)';
+            $search_term = '%' . $wpdb->esc_like($search) . '%';
+            $where_values[] = $search_term;
+            $where_values[] = $search_term;
+        }
 
-        $results = $wpdb->get_results($wpdb->prepare($sql, $limit, $offset));
+        if (!empty($where_clauses)) {
+            $sql .= ' WHERE ' . implode(' AND ', $where_clauses);
+        }
+
+        // Handle orderby - need to prefix with table alias
+        $orderby_column = $orderby === 'product_name' ? 'p.name' : 's.' . $orderby;
+        $sql .= " ORDER BY {$orderby_column} {$order}";
+
+        $sql .= " LIMIT %d OFFSET %d";
+        $where_values[] = $limit;
+        $where_values[] = $offset;
+
+        if (!empty($where_values)) {
+            $results = $wpdb->get_results($wpdb->prepare($sql, ...$where_values));
+        } else {
+            $results = $wpdb->get_results($wpdb->prepare($sql, $limit, $offset));
+        }
+
         return $results ?: [];
     }
 
@@ -309,20 +350,45 @@ class SerialManager {
      * Get serial count
      *
      * @param int|null $product_id Optional product ID filter
+     * @param string $search Optional search term
      * @return int Serial count
      */
-    public static function get_serial_count(?int $product_id = null): int {
+    public static function get_serial_count(?int $product_id = null, string $search = ''): int {
         global $wpdb;
-        $table = $wpdb->prefix . 'wpv_serials';
+        $serials_table = $wpdb->prefix . 'wpv_serials';
+        $products_table = $wpdb->prefix . 'wpv_products';
 
-        if ($product_id !== null) {
-            return (int) $wpdb->get_var($wpdb->prepare(
-                "SELECT COUNT(*) FROM {$table} WHERE product_id = %d",
-                $product_id
-            ));
+        $sql = "SELECT COUNT(*) FROM {$serials_table} s";
+
+        $where_clauses = [];
+        $where_values = [];
+
+        // Join with products table if searching or filtering
+        if (!empty($search) || $product_id !== null) {
+            $sql .= " LEFT JOIN {$products_table} p ON s.product_id = p.id";
         }
 
-        return (int) $wpdb->get_var("SELECT COUNT(*) FROM {$table}");
+        if ($product_id !== null) {
+            $where_clauses[] = 's.product_id = %d';
+            $where_values[] = $product_id;
+        }
+
+        if (!empty($search)) {
+            $where_clauses[] = '(s.serial_number LIKE %s OR p.name LIKE %s)';
+            $search_term = '%' . $wpdb->esc_like($search) . '%';
+            $where_values[] = $search_term;
+            $where_values[] = $search_term;
+        }
+
+        if (!empty($where_clauses)) {
+            $sql .= ' WHERE ' . implode(' AND ', $where_clauses);
+        }
+
+        if (!empty($where_values)) {
+            return (int) $wpdb->get_var($wpdb->prepare($sql, ...$where_values));
+        }
+
+        return (int) $wpdb->get_var($sql);
     }
 
     /**
